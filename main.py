@@ -1,10 +1,9 @@
 import os
 from typing import List
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import SystemMessage, HumanMessage
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.docstore.document import Document
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,7 +21,8 @@ llm = ChatOpenAI(
 # =========================
 
 embeddings = OpenAIEmbeddings()
-vector_store = FAISS.from_documents([], embeddings)
+# W nowszych wersjach LangChain FAISS wymaga przynajmniej jednego dokumentu na start do ustalenia wymiarowości wektora.
+vector_store = FAISS.from_documents([Document(page_content="Inicjalizacja pamięci agenta.")], embeddings)
 
 def save_to_memory(text: str):
     vector_store.add_documents([Document(page_content=text)])
@@ -36,7 +36,7 @@ def retrieve_memory(query: str):
 # =========================
 
 def create_plan(goal: str) -> str:
-    response = llm([
+    response = llm.invoke([
         SystemMessage(content="Jesteś planerem. Twórz krótki plan kroków."),
         HumanMessage(content=f"Cel: {goal}")
     ])
@@ -57,7 +57,7 @@ def execute_step(step: str, state_summary: str) -> str:
     Zwróć tylko kluczowe fakty.
     """
 
-    response = llm([HumanMessage(content=context)])
+    response = llm.invoke([HumanMessage(content=context)])
     return response.content
 
 # =========================
@@ -75,7 +75,7 @@ def compress_state(previous_summary: str, new_info: str) -> str:
     Zaktualizuj krótki stan zadania.
     """
 
-    response = llm([HumanMessage(content=prompt)])
+    response = llm.invoke([HumanMessage(content=prompt)])
     return response.content
 
 # =========================
@@ -105,4 +105,4 @@ def run_agent(goal: str):
 
 
 if __name__ == "__main__":
-    run_agent("Zbadaj rynek kursów AI i podsumuj trendy.")
+    run_agent("Przeszukaj listę najpopularniejszych darmowych kursów AI i wskaż 3 najlepsze skupiające się na budowaniu RAGów w LangChain")
