@@ -4,3 +4,4 @@ langchain-community
 faiss-cpu
 tiktoken
 python-dotenv
+duckduckgo-search

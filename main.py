@@ -42,23 +42,30 @@ def create_plan(goal: str) -> str:
     ])
     return response.content
 
+from langgraph.prebuilt import create_react_agent
+from langchain_community.tools.ddg_search import DuckDuckGoSearchRun
+
 # =========================
-# 4. Executor (izolowany kontekst)
+# 4. Executor (izolowany kontekst z narzędziami)
 # =========================
+
+search_tool = DuckDuckGoSearchRun()
+tools = [search_tool]
 
 def execute_step(step: str, state_summary: str) -> str:
-    context = f"""
-    Aktualny stan:
+    prompt = f"""
+    Jesteś asystentem wykonującym pobieranie i analizowanie danych. Zawsze zwracaj konkretne fakty. Używaj wyszukiwarki internetowej, aby dowiedzieć się potrzebnych i bieżących informacji na dany temat.
+    Aktualny stan zadania:
     {state_summary}
-
-    Wykonaj krok:
+    
+    Wykonaj ten krok:
     {step}
-
-    Zwróć tylko kluczowe fakty.
     """
-
-    response = llm.invoke([HumanMessage(content=context)])
-    return response.content
+    
+    agent = create_react_agent(llm, tools=tools)
+    
+    response = agent.invoke({"messages": [("user", prompt)]})
+    return response["messages"][-1].content
 
 # =========================
 # 5. Rolling summary
