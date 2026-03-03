@@ -1,4 +1,5 @@
 import os
+import warnings
 from typing import List
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -6,13 +7,15 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from dotenv import load_dotenv
 
+warnings.filterwarnings("ignore")
+
 load_dotenv()
 # =========================
 # 1. Model
 # =========================
 
 llm = ChatOpenAI(
-    model="gpt-4",
+    model="gpt-4o",
     temperature=0
 )
 
