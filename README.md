@@ -49,5 +49,3 @@ Aby uruchomić aplikację i zobaczyć jak agent wykonuje zakodowane w `main.py` 
 ```bash
 python main.py
 ```
-
-Skrypt domyślnie zacznie badać rynek kursów AI, tworząc plan i na bieżąco zwracając etapy pracy aż do finalnego podsumowania.
